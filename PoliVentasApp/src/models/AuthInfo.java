@@ -10,6 +10,10 @@ public class AuthInfo {
     private Boolean recordarLoggin;
     Date logginDate;
 
+    public AuthInfo() {
+    }
+
+
     public AuthInfo(Usuario usuario, Date logginDate, Boolean loggeoExitoso, Boolean recordarLoggin) {
         this.usuario = usuario;
         this.loggeoExitoso = loggeoExitoso;
@@ -21,6 +25,15 @@ public class AuthInfo {
         return usuario;
     }
 
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public void setLoggeoExitoso(Boolean loggeoExitoso) {
+        this.loggeoExitoso = loggeoExitoso;
+    }
+
+    
     public Boolean isLoggeoExitoso() {
         return loggeoExitoso;
     }

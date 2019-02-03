@@ -19,6 +19,7 @@ public class Comprador extends Usuario {
     List<Pedido> compras;
 
     public Comprador(){
+        super();
         this.rol = Rol.COMPRADOR;
     }
 

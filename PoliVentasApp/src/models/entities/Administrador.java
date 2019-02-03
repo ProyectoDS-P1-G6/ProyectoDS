@@ -14,9 +14,12 @@ public class Administrador extends Usuario {
     Rol tempRol = Rol.ADMIN;
 
     public Administrador(){
+        super();
         this.rol = Rol.ADMIN;
     }
-
+    
+    
+    
     public boolean cambiarRol(Rol rol){
 
         if(rol == Rol.ADMIN)
@@ -24,6 +27,12 @@ public class Administrador extends Usuario {
 
         this.tempRol = rol;
         return true;
+    }
+    
+    
+    
+    public Administrador build(){
+        return this;
     }
 
 }

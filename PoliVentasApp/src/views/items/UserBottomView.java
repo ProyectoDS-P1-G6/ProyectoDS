@@ -5,15 +5,14 @@
  */
 package views.items;
 
-import com.jfoenix.controls.JFXButton;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import models.entities.Usuario;
+import javafx.scene.paint.Color;
 
 /**
  *
@@ -45,15 +44,21 @@ public class UserBottomView extends StackPane{
         informacion.setPrefSize(400, 90);
         
         opciones.setAlignment(Pos.CENTER);
-        opciones.setPrefWidth(80);
+        opciones.setPrefWidth(100);
         
         
-        cuerpo.setPrefSize(500, 100);
+        cuerpo.setPrefSize(600, 100);
         cuerpo.setAlignment(Pos.CENTER);
+        cuerpo.setEffect(new DropShadow(10, Color.rgb(230, 240, 255)));
+        cuerpo.setOnMouseEntered(event -> cuerpo.setEffect(new DropShadow(17, Color.rgb(221, 221, 221))));
+        cuerpo.setOnMouseExited(t -> cuerpo.setEffect(new DropShadow(10, Color.rgb(235, 240, 255))));
+        cuerpo.getStyleClass().add("content");
+        cuerpo.getStylesheets().add("assets/item-articulo.css");
         getChildren().add(cuerpo);
       
         
     }
+    
                     
 //    public void createButtonUser(Usuario user){
 //        nombre.setText(user.getNombres()+" "+user.getApellidos());

@@ -1,22 +1,29 @@
 package controllers;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import models.AuthInfo;
 import models.entities.Administrador;
-import models.entities.Comprador;
 import models.entities.Usuario;
-import models.entities.Vendedor;
 import services.DBConnection;
 import services.LoginServiceDB;
+import utils.Returnable;
 import utils.StageDecoratorX;
 import views.*;
 
-public class LoginController {
+public class LoginController implements Returnable{
 
     private Usuario usuario;
     private LoginView view;
+    
+    Returnable previusWindow;
 
     /*
      * Informacion de autenticacion del usuario.
@@ -35,47 +42,70 @@ public class LoginController {
         view.addLogUpAction(new SignUpAction());
 
         view.setOnCloseRequest(
-                windowEvent -> { DBConnection.shutdownConnection();
-                System.out.println("Cerrada la conección");}
-                );
+            windowEvent -> { DBConnection.shutdownConnection();
+                previusWindow.showWindow();
+                view.close();
+            }
+        );
+    }
+
+    @Override
+    public void setPreviusWindow(Returnable previous) {
+        this.previusWindow = previous;
+    }
+
+    @Override
+    public void showWindow() {
+        this.view.show();
     }
 
     class LoginAction implements EventHandler<ActionEvent>{
 
         @Override
-        public void handle(ActionEvent actionEvent) {
-            System.out.println("iniciar sesión....");
-            System.out.printf("user: %s password: %s\n", view.getUsuarioInput(), view.getContrasenaInput() );
-            authInfo = ls.authUser(view.getUsuarioInput(), view.getContrasenaInput());
+        public void handle(ActionEvent actionEvent){
+            try {
 
-            if(!authInfo.isLoggeoExitoso()){
-                view.setStatusMessage("** Datos incorrectos.");
-                return;
-            }
-            switch(authInfo.getUsuario().getRol()){
+                authInfo = ls.authUser(view.getUsuarioInput(), view.getContrasenaInput());
+                
+                if(!authInfo.isLoggeoExitoso()){
+                    view.setStatusMessage("** Datos incorrectos.");
+                    return;
+                }
+                view.close();
+                
+                Stage stage = new Stage();
+                FXMLLoader loader;
+                switch(authInfo.getUsuario().getRol()){
+                    
+                    case ADMIN:
+                        MenuAdministrador menuAdministrador = new MenuAdministrador();
+                        new StageDecoratorX(menuAdministrador);
+                        new MenuAdministradorController((Administrador) authInfo.getUsuario(), menuAdministrador)
+                                .setPreviusWindow(LoginController.this);
+                        menuAdministrador.show();
+                        break;
+                        
+                    case VENDEDOR:
 
-                case ADMIN:
-                    MenuAdministrador menuAdministrador = new MenuAdministrador();
-                    new StageDecoratorX(menuAdministrador);
-                    new MenuAdministradorController((Administrador) authInfo.getUsuario(), menuAdministrador);
-                    menuAdministrador.show();
-                    break;
-
-                case VENDEDOR:
-                    MenuVendedor menuVendedor = new MenuVendedor();
-                    new StageDecoratorX(menuVendedor);
-                    new MenuVendedorController((Vendedor) authInfo.getUsuario(), menuVendedor);
-                    menuVendedor.show();
-                    break;
-
-                case COMPRADOR:
-                    MenuComprador menuComprador = new MenuComprador();
-                    new StageDecoratorX(menuComprador);
-                    new MenuCompradorController((Comprador) authInfo.getUsuario(), menuComprador);
-                    menuComprador.show();
-                    break;
-
-
+                        loader = new FXMLLoader(getClass().getResource("/views/MenuVendedor.fxml"));
+                        stage.setScene(new Scene(loader.load()));
+                        loader.<MenuVendedorController>getController().setPreviusWindow(LoginController.this);
+                        new StageDecoratorX(stage);
+                        stage.show();
+                        break;
+                        
+                    case COMPRADOR:
+                        loader = new FXMLLoader(getClass().getResource("/views/MenuComprador.fxml"));
+                        stage.setScene(new Scene(loader.load()));
+                        loader.<MenuCompradorController>getController().setPreviusWindow(LoginController.this);
+                        new StageDecoratorX(stage);
+                        stage.show();
+                        break;
+                        
+                        
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -84,11 +114,25 @@ public class LoginController {
 
         @Override
         public void handle(MouseEvent actionEvent) {
-            System.out.println("registrarse....");
-            RegistroForm form = new RegistroForm();
-            new StageDecoratorX(form);
-            form.show();
+            Stage stage = new Stage();
+                    
+            try {
+                FXMLLoader loader;
+                loader = new FXMLLoader(getClass().getResource("/views/RegistroForm.fxml"));
+                stage.setScene(new Scene(loader.load()));
+                new StageDecoratorX(stage);
+            } catch (IOException ex) {
+                Logger.getLogger(InicioController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            stage.show();
         }
     }
+
+    public LoginView getView() {
+        return view;
+    }
+    
+    
 
 }
